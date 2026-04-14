@@ -1,0 +1,1 @@
+insert into users (login, password) values ('admin@mail.ru', '12345');

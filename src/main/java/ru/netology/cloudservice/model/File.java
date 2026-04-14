@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Сущность файла, загруженного в облачное хранилище.
+ * Содержит метаданные файла (имя, размер) и само содержимое в виде массива байтов.
+ */
 @Entity
 @Table(name = "files")
 @Data
@@ -22,7 +26,7 @@ public class File {
     @Column(nullable = false)
     private Long size;
 
-    @Lob // Указывает, что это большой объект (Large Object)
+    @Lob
     @Column(nullable = false)
     private byte[] fileContent;
 

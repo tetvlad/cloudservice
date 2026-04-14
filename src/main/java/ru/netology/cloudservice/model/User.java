@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Сущность пользователя сервиса облачного хранилища.
+ * Хранит учетные данные для авторизации и связи с загруженными файлами.
+ */
 @Entity
 @Table(name = "users")
 @Data

@@ -7,11 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import ru.netology.cloudservice.dto.FileResponse;
 import ru.netology.cloudservice.model.File;
 import ru.netology.cloudservice.model.User;
 import ru.netology.cloudservice.repository.FileRepository;
-import ru.netology.cloudservice.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,9 +26,6 @@ class FileServiceTest {
     @Mock
     private FileRepository fileRepository;
 
-    @Mock
-    private UserRepository userRepository;
-
     @InjectMocks
     private FileService fileService;
 
@@ -45,43 +40,41 @@ class FileServiceTest {
 
     @Test
     void getFiles_Success() {
-        when(userRepository.findById(testUser.getLogin())).thenReturn(Optional.of(testUser));
+        // Только fileRepository
         when(fileRepository.findAllByUser(testUser)).thenReturn(List.of(testFile));
 
-        List<FileResponse> result = fileService.getFiles(testUser.getLogin(), 3);
+        // Теперь метод будет возвращать List<File>, а не DTO
+        List<File> result = fileService.getFiles(testUser, 3);
 
         assertEquals(1, result.size());
-        assertEquals("test-image.jpg", result.get(0).filename());
-        assertEquals(1024L, result.get(0).size());
+        assertEquals("test-image.jpg", result.get(0).getFilename());
+        assertEquals(1024L, result.get(0).getSize());
     }
 
     @Test
     void uploadFile_Success() {
-        when(userRepository.findById(testUser.getLogin())).thenReturn(Optional.of(testUser));
         MockMultipartFile mockMultipartFile = new MockMultipartFile(
                 "file", "test-image.jpg", "image/jpeg", "dummy-content".getBytes()
         );
 
-        fileService.uploadFile(testUser.getLogin(), "test-image.jpg", mockMultipartFile);
+        // Передаем testUser напрямую
+        fileService.uploadFile(testUser, "test-image.jpg", mockMultipartFile);
 
         verify(fileRepository, times(1)).save(any(File.class));
     }
 
     @Test
     void deleteFile_Success() {
-        when(userRepository.findById(testUser.getLogin())).thenReturn(Optional.of(testUser));
-
-        fileService.deleteFile(testUser.getLogin(), "test-image.jpg");
+        fileService.deleteFile(testUser, "test-image.jpg");
 
         verify(fileRepository, times(1)).deleteByFilenameAndUser("test-image.jpg", testUser);
     }
 
     @Test
     void downloadFile_Success() {
-        when(userRepository.findById(testUser.getLogin())).thenReturn(Optional.of(testUser));
         when(fileRepository.findByFilenameAndUser("test-image.jpg", testUser)).thenReturn(Optional.of(testFile));
 
-        File result = fileService.downloadFile(testUser.getLogin(), "test-image.jpg");
+        File result = fileService.downloadFile(testUser, "test-image.jpg");
 
         assertNotNull(result);
         assertEquals("test-image.jpg", result.getFilename());
@@ -89,10 +82,9 @@ class FileServiceTest {
 
     @Test
     void renameFile_Success() {
-        when(userRepository.findById(testUser.getLogin())).thenReturn(Optional.of(testUser));
         when(fileRepository.findByFilenameAndUser("test-image.jpg", testUser)).thenReturn(Optional.of(testFile));
 
-        fileService.renameFile(testUser.getLogin(), "test-image.jpg", "new-name.jpg");
+        fileService.renameFile(testUser, "test-image.jpg", "new-name.jpg");
 
         assertEquals("new-name.jpg", testFile.getFilename());
         verify(fileRepository, times(1)).save(testFile);

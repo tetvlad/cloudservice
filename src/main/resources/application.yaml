@@ -14,3 +14,10 @@ spring:
   sql:
     init:
       mode: always
+
+logging:
+  file:
+    name: logs/cloud-service.log
+  level:
+    ru.netology.cloudservice: INFO
+    org.springframework.web: WARN

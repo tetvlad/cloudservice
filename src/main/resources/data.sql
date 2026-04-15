@@ -1,1 +1,1 @@
-insert into users (login, password) values ('admin@mail.ru', '12345');
+insert into users (login, password) values ('admin@mail.ru', '12345') on conflict (login) do nothing;
